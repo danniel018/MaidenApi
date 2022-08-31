@@ -1,9 +1,9 @@
-from flask import Flask, jsonify, request, make_response
+from flask import Flask
 from flask_restful import  Api
-from http import HTTPStatus
 from config import Config
 from extensions import db
-from resources.ironmaiden import MaidenMembers
+from resources.members import MaidenMembers, Member
+from resources.albums import MaidenAlbums
 
 app = Flask(__name__)
 app.config.from_object(Config)
@@ -12,7 +12,8 @@ api = Api(app)
 
         
 api.add_resource(MaidenMembers,'/members')
-#api.add_resource(Members,'/members/<int:id>')
+api.add_resource(Member,'/members/<int:id>')
+api.add_resource(MaidenAlbums,'/albums')
 
 
 if __name__ == "__main__":
