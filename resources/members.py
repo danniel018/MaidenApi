@@ -4,6 +4,7 @@ from flask_restful import Resource
 from http import HTTPStatus
 from models.members import Members      
 from schemas.members import MembersSchema
+from marshmallow import ValidationError
 
 member_schema = MembersSchema()
 
@@ -17,20 +18,18 @@ class MaidenMembers(Resource):
         return data,HTTPStatus.OK
 
     def post(self): ##post method is written in this class due to no id is needed to upload a resource unlike the class Member
-        member_data = request.get_json()
-        data = member_schema.load(data=member_data)
-
-        # if errors:
-        #     return {'error':'incorrect data','errors':errors},HTTPStatus.BAD_REQUEST
-
-        # new_member = Members(name=member_data['name'], 
-        #     date_of_birth=member_data['birthday'],
-        #     active=member_data['active'])
-        new_member=Members(**data)
         
+        member_data = request.get_json()
+        
+        try:
+            data = member_schema.load(data=member_data)
+        except ValidationError as e:
+            print(e.messages)
+            return e.messages,HTTPStatus.BAD_REQUEST
+
+        new_member=Members(**data)
         new_member.save()
 
-        #return new_member.queried_data(), HTTPStatus.CREATED
         return member_schema.dump(new_member), HTTPStatus.CREATED
 
 class Member(Resource):
