@@ -1,24 +1,31 @@
 from flask import request
 from flask_restful import Resource
 from http import HTTPStatus
-from models.albums import Albums, Songs    
+from models.albums import Albums, Songs   
+from schemas.members import AlbumsSchema 
 
+albums_schema = AlbumsSchema(many=True)
 class MaidenAlbums(Resource):
 
     def get(self):
         main=[]
         members = Albums.all_albums()
-        
         for x in members:
-            data={}
-            data[x.name]={'id':x.album_id,'release date':str(x.release_date)}
-            songs = Songs.songs_by_album(x.album_id)
-            data[x.name]['songs'] = [x.name for x in songs]
-            data[x.name]['personnel'] = [i.name for i in x.members]
-            print(x.release_date.year)
-            main.append(data)
+            for y in x.album_songs:
+                print(y.name)
+        
+        # for x in members:
+        #     data={}
+        #     data[x.name]={'id':x.album_id,'release date':str(x.release_date)}
+        #     songs = Songs.songs_by_album(x.album_id)
+        #     data[x.name]['songs'] = [x.name for x in songs]
+        #     data[x.name]['personnel'] = [i.name for i in x.members]
+        #     print(x.release_date.year)
+        #     main.append(data)
           
-        return main,HTTPStatus.OK
+        # return main,HTTPStatus.OK
+
+        return albums_schema.dump(members),HTTPStatus.OK 
 
 class Album(Resource):
 

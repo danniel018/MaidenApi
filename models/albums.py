@@ -22,7 +22,8 @@ class Albums(db.Model,commit):
     release_date = db.Column(db.Date(),nullable=False)
     length=db.Column(TIME(),nullable=False)
     cover = db.Column(db.String(85), nullable=False)
-    songs = db.relationship('Songs',backref='album')
+    #songs = db.relationship('Songs',backref='album')
+    album_songs = db.relationship('Songs',back_populates='album')
     members = db.relationship('Members',secondary=members_albums,back_populates='albums') 
 
     def queried_data(self):
@@ -52,6 +53,7 @@ class Songs(db.Model):
     length = db.Column(TIME(),nullable=False)
     top_popular = db.Column(ENUM('yes','no'),nullable=False, default='no')
     album_id = db.Column(INTEGER(unsigned=True),db.ForeignKey('albums.album_id'))
+    album = db.relationship('Albums',back_populates='album_songs')
     members = db.relationship('Members',secondary=members_songs,back_populates='songs')
 
     @classmethod
