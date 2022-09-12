@@ -1,4 +1,5 @@
 from marshmallow import Schema, fields, validate, post_dump
+from werkzeug.security import generate_password_hash
 
 
 class MembersSchema(Schema):
@@ -47,3 +48,15 @@ class AlbumsSchema(Schema):
             return {'Albums': data}
         return data
  
+class UsersSchema(Schema):
+    class Meta:
+        ordered = True
+
+    user_id = fields.Integer(dump_only=True)
+    name = fields.String(required=True)
+    mail = fields.Email(required=True)
+    password = fields.Method(required=True, deserialize='hash_password')
+    
+
+    def hash_password(self,password):
+        return generate_password_hash(password,'sha256')

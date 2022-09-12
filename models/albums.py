@@ -79,3 +79,15 @@ class Songs(db.Model):
         return songs
 
     
+class Users(db.Model,commit):
+    __tablename__ = 'users'
+
+    user_id = db.Column(INTEGER(unsigned=True), primary_key=True) 
+    name = db.Column(db.String(30), nullable=False)
+    mail = db.Column(db.String(50), nullable=False,unique=True)
+    password = db.Column(db.String(256),nullable=False)
+
+    @classmethod
+    def get_by_email(cls,mail):
+
+        return cls.query.filter_by(mail = mail).first()
