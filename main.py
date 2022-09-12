@@ -6,6 +6,7 @@ from resources.members import MaidenMembers, Member
 from resources.albums import MaidenAlbums, Album
 from resources.songs import MaidenSongs, PopularSongs, Song
 from resources.users import NewUser
+from resources.token import Token_
 
 app = Flask(__name__)
 app.config.from_object(Config)
@@ -22,6 +23,7 @@ api.add_resource(MaidenSongs,'/songs')
 api.add_resource(PopularSongs,'/songs/popular')
 api.add_resource(Song,'/songs/<int:id>')
 api.add_resource(NewUser,'/users')
+api.add_resource(Token_,'/token')
 
 if __name__ == "__main__":
     app.run(debug=True)

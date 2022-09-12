@@ -19,7 +19,7 @@ class NewUser(Resource):
         except ValidationError as e:
             return e.messages,HTTPStatus.BAD_REQUEST
         
-        if Users.get_by_email(data.get('email')): 
+        if Users.get_by_email(data.get('mail')):
             return {'message': 'email already used'}, HTTPStatus.BAD_REQUEST
 
         user = Users(**data)

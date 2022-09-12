@@ -3,12 +3,14 @@ from flask_restful import Resource
 from http import HTTPStatus
 from models.albums import Albums, Songs   
 from schemas.members import AlbumsSchema, SongsSchema 
+from flask_jwt_extended import jwt_required
 
 all_albums_schema = AlbumsSchema(many=True,exclude=('cover','length'))
 album_schema = AlbumsSchema()
 songs_schema = SongsSchema(many=True,only=('name',))
 class MaidenAlbums(Resource):
 
+    @jwt_required()
     def get(self):
     
         albums = Albums.all_albums()    
