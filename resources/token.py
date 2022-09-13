@@ -6,6 +6,7 @@ from flask_jwt_extended import (
     create_refresh_token,
     get_jwt_identity,
     jwt_required,
+    get_jwt
     
     
 )
@@ -14,7 +15,7 @@ from werkzeug.security import check_password_hash
 
 from models.albums import Users
 
-#black_list = set()
+block_list = set()
 
 
 class Token(Resource):
@@ -45,3 +46,13 @@ class RefreshToken(Resource):
 
         token = create_access_token(identity=current_user, fresh=False)
         return {'token': token}, HTTPStatus.OK
+
+class RevokeToken(Resource):
+
+    @jwt_required()
+    def post(self):
+        
+        jti = get_jwt()['jti']
+        block_list.add(jti) 
+
+        return {'message': 'Successfully logged out'}, HTTPStatus.OK
