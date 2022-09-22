@@ -1,6 +1,9 @@
+from ast import dump
+from re import T
 from typing import Type
 from marshmallow import Schema, fields, validate, post_dump
 from werkzeug.security import generate_password_hash
+from datetime import datetime
 
 
 class MembersSchema(Schema):
@@ -11,12 +14,25 @@ class MembersSchema(Schema):
     date_of_birth = fields.Date(required=True)
     active = fields.String(required=True,validate=validate.OneOf(('yes','no'))) 
     songs = fields.Nested(lambda: SongsSchema(many=True),dump_only=True,only=('name',),data_key='composed songs')
+    periods = fields.Nested(lambda: PeriodsSchema(many=True),dump_only=True,only=('start','end'))
 
     @post_dump(pass_many=True)
     def member_songs(self,data,many): 
         print(type(data))
         print(len(data['composed songs']))
         data['composed songs'] = len(data['composed songs'])
+        
+        total_years = 0
+        for x in data['periods']:
+            try:
+                total_years += x['end'] - x['start']
+            except TypeError:
+                total_years += datetime.now().year - x['start']
+        data['active years'] = total_years
+        #     data['periods'] =data['periods'][0]['end'] - data['periods'][0]['start']   
+        # except TypeError as e:
+        #     print(e)
+        #     data['periods'] =datetime.now().year - data['periods'][0]['start']   
 
         return data
         #return len(data)
@@ -74,3 +90,12 @@ class UsersSchema(Schema):
 
     def hash_password(self,password):
         return generate_password_hash(password,'sha256')
+
+class PeriodsSchema(Schema):
+    class Meta:
+        ordered = True
+
+    period_id = fields.Integer(dump_only=True)
+    member_id = fields.Integer(required = True)
+    start = fields.Integer(required = True)
+    end = fields.Integer(required = True)

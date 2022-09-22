@@ -1,5 +1,5 @@
 from extensions import db
-from sqlalchemy.dialects.mysql import INTEGER, ENUM
+from sqlalchemy.dialects.mysql import INTEGER, ENUM, YEAR
 from .albums import members_songs, members_albums
 
 from .songs import commit
@@ -12,7 +12,8 @@ class Members(db.Model,commit):
     active = db.Column(ENUM('yes','no'),default='yes')
     songs = db.relationship('Songs',secondary= members_songs,back_populates='members')
     albums = db.relationship('Albums',secondary=members_albums,back_populates='members')
-    
+    periods = db.relationship('Periods',back_populates='member')
+
     def queried_data(self):
         data = {'member_id':self.member_id,'name':self.name,'birthday':str(self.date_of_birth),
         'active':self.active}
@@ -41,3 +42,12 @@ class Members(db.Model,commit):
     def delete (self):
         db.session.delete(self)
         db.session.commit()
+
+class Periods(db.Model):
+    __tablename__ = 'members_periods'
+
+    period_id = db.Column(INTEGER(unsigned=True), primary_key=True)
+    member_id = db.Column(INTEGER(unsigned=True),db.ForeignKey('members.member_id'), nullable=False)
+    member = db.relationship('Members',back_populates='periods')
+    start = db.Column(YEAR(),nullable=False)
+    end = db.Column(YEAR())
