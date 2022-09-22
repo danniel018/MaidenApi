@@ -28,7 +28,11 @@ api.add_resource(Album,'/albums/<int:id>')
 api.add_resource(MaidenSongs,'/songs')
 api.add_resource(PopularSongs,'/songs/popular')
 api.add_resource(Song,'/songs/<int:id>')
+
+
 api.add_resource(NewUser,'/users')
+
+
 api.add_resource(Token,'/token')
 api.add_resource(RefreshToken,'/refresh')
 api.add_resource(RevokeToken,'/revoke') 

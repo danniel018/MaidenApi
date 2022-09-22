@@ -1,13 +1,27 @@
+from typing import Type
 from marshmallow import Schema, fields, validate, post_dump
 from werkzeug.security import generate_password_hash
 
 
 class MembersSchema(Schema):
-    
+    class Meta:
+        ordered = True
     member_id = fields.Int(dump_only=True)
     name = fields.String(required=True)
     date_of_birth = fields.Date(required=True)
-    active = fields.String(required=True,validate=validate.OneOf(('yes','no')))  
+    active = fields.String(required=True,validate=validate.OneOf(('yes','no'))) 
+    songs = fields.Nested(lambda: SongsSchema(many=True),dump_only=True,only=('name',),data_key='composed songs')
+
+    @post_dump(pass_many=True)
+    def member_songs(self,data,many): 
+        print(type(data))
+        print(len(data['composed songs']))
+        data['composed songs'] = len(data['composed songs'])
+
+        return data
+        #return len(data)
+        
+        
     
 class SongsSchema(Schema):
     class Meta:

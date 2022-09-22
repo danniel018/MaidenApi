@@ -30,6 +30,9 @@ class Members(db.Model,commit):
         member = cls.query.filter_by(member_id = id).first()
         return member
 
+    @classmethod
+    def member_songs(cls,id):
+        songs= cls.query.filter_by(member_id = id).first()
     
     # def save(self):
     #     db.session.add(self)

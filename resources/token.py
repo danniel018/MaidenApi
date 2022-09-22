@@ -54,5 +54,6 @@ class RevokeToken(Resource):
         
         jti = get_jwt()['jti']
         block_list.add(jti) 
-
+        #vt_1P__SioINRwsb2CAEv2zo63TEROte3Gzh
+        
         return {'message': 'Successfully logged out'}, HTTPStatus.OK
