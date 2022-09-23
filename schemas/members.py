@@ -116,3 +116,19 @@ class LiveAlbumsSchema(Schema):
         if many:
             return {'Albums': data}
         return data
+
+class ToursSchema(Schema):
+    class Meta:
+        ordered = True 
+
+    tour_id = fields.Integer(dump_only=True)
+    name = fields.String(required=True)
+    start = fields.Date(required=True,data_key='tour start')
+    end = fields.Date(required=True,data_key='tour end')
+    live_album = fields.Nested(LiveAlbumsSchema(many=True),dump_only=True,only=('name',),data_key='live albums') 
+    songs = fields.Nested(SongsSchema(many=True),dump_only=True,only=('name',),data_key='setlist') 
+     
+    
+    
+
+    

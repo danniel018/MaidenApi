@@ -5,15 +5,15 @@ from models.albums import Albums, LiveAlbums
 from schemas.members import AlbumsSchema, SongsSchema , LiveAlbumsSchema
 from flask_jwt_extended import jwt_required
 
-all_albums_schema = AlbumsSchema(many=True,exclude=('cover','length'))
+all_albums_schema = AlbumsSchema(many=True,exclude=('cover','length','album_songs','members'))
 album_schema = AlbumsSchema()
 songs_schema = SongsSchema(many=True,only=('name',))
 
-all_live_albums_schema = LiveAlbumsSchema(many=True,exclude=('length',))
+all_live_albums_schema = LiveAlbumsSchema(many=True,exclude=('length','songs'))
 live_album_schema = LiveAlbumsSchema()
 class MaidenAlbums(Resource):
 
-    @jwt_required()
+    #@jwt_required()
     def get(self):
     
         albums = Albums.all_albums()    
@@ -42,7 +42,7 @@ class LiveAlbum(Resource):
 
     def get(self,id):
         
-        album = Albums.album_by_id(id)
+        album = LiveAlbums.album_by_id(id)
         if album == None:
             return {'data':'not found that'},HTTPStatus.NOT_FOUND 
         

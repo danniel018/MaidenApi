@@ -7,6 +7,7 @@ from resources.albums import MaidenAlbums, Album, LiveMaidenAlbums, LiveAlbum
 from resources.songs import MaidenSongs, PopularSongs, Song
 from resources.users import NewUser
 from resources.token import Token, RefreshToken,RevokeToken,block_list
+from resources.tours import MaidenTours, Tour
 
 app = Flask(__name__)
 app.config.from_object(Config)
@@ -23,14 +24,18 @@ def check_if_token_revoked(jwt_header,jwt_payload):
 
 api.add_resource(MaidenMembers,'/members')
 api.add_resource(Member,'/members/<int:id>')
+
 api.add_resource(MaidenAlbums,'/albums') 
 api.add_resource(Album,'/albums/<int:id>')
 api.add_resource(LiveMaidenAlbums,'/live-albums') 
 api.add_resource(LiveAlbum,'/live-albums/<int:id>')
+
 api.add_resource(MaidenSongs,'/songs')
 api.add_resource(PopularSongs,'/songs/popular')
 api.add_resource(Song,'/songs/<int:id>')
 
+api.add_resource(MaidenTours,'/tours')
+api.add_resource(Tour,'/tours/<int:id>')
 
 api.add_resource(NewUser,'/users')
 
