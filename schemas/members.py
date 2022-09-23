@@ -15,13 +15,14 @@ class MembersSchema(Schema):
     active = fields.String(required=True,validate=validate.OneOf(('yes','no'))) 
     songs = fields.Nested(lambda: SongsSchema(many=True),dump_only=True,only=('name',),data_key='composed songs')
     periods = fields.Nested(lambda: PeriodsSchema(many=True),dump_only=True,only=('start','end'))
+    albums = fields.Nested(lambda: MembersSchema(many=True),dump_only=True,only=('name',),data_key='Discography')
 
     @post_dump(pass_many=True)
     def member_songs(self,data,many): 
-        print(type(data))
-        print(len(data['composed songs']))
-        data['composed songs'] = len(data['composed songs'])
-        
+        if many:
+            return data
+            
+        data['composed songs'] = len(data['composed songs'])  
         total_years = 0
         for x in data['periods']:
             try:
@@ -29,13 +30,9 @@ class MembersSchema(Schema):
             except TypeError:
                 total_years += datetime.now().year - x['start']
         data['active years'] = total_years
-        #     data['periods'] =data['periods'][0]['end'] - data['periods'][0]['start']   
-        # except TypeError as e:
-        #     print(e)
-        #     data['periods'] =datetime.now().year - data['periods'][0]['start']   
-
+        
         return data
-        #return len(data)
+     
         
         
     
@@ -99,3 +96,23 @@ class PeriodsSchema(Schema):
     member_id = fields.Integer(required = True)
     start = fields.Integer(required = True)
     end = fields.Integer(required = True)
+
+
+class LiveAlbumsSchema(Schema):
+    class Meta:
+        ordered = True 
+
+    live_album_id = fields.Integer(dump_only=True)
+    name = fields.String(required=True)
+    release_date = fields.Date(required=True)
+    length=fields.Time(required=True)
+    #cover = fields.Url(required= True)
+    songs = fields.Nested(SongsSchema(many=True),dump_only=True,only=('name',),data_key='songs') 
+    #members = fields.Nested(MembersSchema(many=True),dump_only=True,only=('name',),data_key='Personnel')
+
+
+    @post_dump(pass_many=True)
+    def wrap(self, data, many, **kwargs):
+        if many:
+            return {'Albums': data}
+        return data

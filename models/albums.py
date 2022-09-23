@@ -15,6 +15,12 @@ members_albums = db.Table ('members_albums',
     db.Column('member_id',db.ForeignKey('members.member_id')),
     db.Column('album_id',db.ForeignKey('albums.album_id')))
 
+live = db.Table ('live',
+    db.Column('live_id',INTEGER(unsigned=True),primary_key=True),
+    db.Column('song_id',db.ForeignKey('songs.song_id')),
+    #db.Column('tour_id',db.ForeignKey('albums.album_id')),
+    db.Column('live_album_id',db.ForeignKey('live_albums.live_album_id')))
+
 class Albums(db.Model,commit):
     __tablename__ = 'albums'
     album_id = db.Column(INTEGER(unsigned=True), primary_key=True)
@@ -40,8 +46,8 @@ class Albums(db.Model,commit):
     @classmethod
     def album_by_id(cls,id):
 
-        member = cls.query.filter_by(album_id = id).first()
-        return member
+        album = cls.query.filter_by(album_id = id).first()
+        return album
 
    
 class Songs(db.Model):
@@ -55,6 +61,7 @@ class Songs(db.Model):
     album_id = db.Column(INTEGER(unsigned=True),db.ForeignKey('albums.album_id'))
     album = db.relationship('Albums',back_populates='album_songs')
     members = db.relationship('Members',secondary=members_songs,back_populates='songs')
+    live_album = db.relationship('LiveAlbums',secondary=live,back_populates='songs')
 
     @classmethod
     def all_songs(cls,popular=False,year=None):
@@ -91,3 +98,33 @@ class Users(db.Model,commit):
     def get_by_email(cls,mail):
 
         return cls.query.filter_by(mail = mail).first()
+
+class LiveAlbums(db.Model,commit):
+    __tablename__ = 'live_albums'
+
+    live_album_id = db.Column(INTEGER(unsigned=True), primary_key=True) 
+    name = db.Column(db.String(35), nullable=False)
+    release_date = db.Column(db.Date(),nullable=False)
+    length=db.Column(TIME(),nullable=False)
+    songs = db.relationship('Songs',secondary=live,back_populates='live_album')
+
+    @classmethod
+    def all_albums(cls):
+
+        return cls.query.all()
+
+    @classmethod
+    def album_by_id(cls,id):
+
+        album = cls.query.filter_by(live_album_id = id).first()
+        return album
+
+# class Live(db.Model,commit):
+#     __tablename__ = 'live'
+
+#     live_id = db.Column(INTEGER(unsigned=True), primary_key=True) 
+#     song_id = db.Column(INTEGER(unsigned=True),db.ForeignKey('songs.songs_id'))
+#     #tour_id = db.Column(INTEGER(unsigned=True),db.ForeignKey('tours.tour_id'))
+#     live_album_id = db.Column(INTEGER(unsigned=True),db.ForeignKey('albums.album_id'))
+#     length=db.Column(TIME(),nullable=False)
+#     songs = db.relationship('Songs',back_populates='album_songs')

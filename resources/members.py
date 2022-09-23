@@ -6,7 +6,7 @@ from models.members import Members
 from schemas.members import MembersSchema
 from marshmallow import ValidationError
 
-all_members_schema = MembersSchema(many=True)
+all_members_schema = MembersSchema(many=True,exclude=('songs','periods','albums')) 
 member_schema = MembersSchema(exclude=('member_id',))
 
 
@@ -19,7 +19,7 @@ class MaidenMembers(Resource):
 
     def post(self): ##post method is written in this class due to no id is needed to upload a resource unlike the class Member
         
-        member_data = request.get_json()
+        member_data = request.get_json() 
         
         try:
             data = all_members_schema.load(data=member_data)
