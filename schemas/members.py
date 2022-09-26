@@ -34,8 +34,6 @@ class MembersSchema(Schema):
         return data
      
         
-        
-    
 class SongsSchema(Schema):
     class Meta:
         ordered = True
@@ -47,6 +45,8 @@ class SongsSchema(Schema):
     top_popular = fields.String(required=True,validate=validate.OneOf(('yes','no')))
     album = fields.Nested(lambda: AlbumsSchema, dump_only=True, only=('name',) )
     members = fields.Nested(MembersSchema(many=True),dump_only=True,only=('name',),data_key='composer(s)')
+    live_album = fields.Nested(lambda: LiveAlbumsSchema(many=True),dump_only=True,only=('name',),data_key='Recorded live')  
+    tour = fields.Nested(lambda: ToursSchema(many=True),dump_only=True,only=('name',),data_key='Performed live') 
 
 
     @post_dump(pass_many=True)
@@ -129,6 +129,10 @@ class ToursSchema(Schema):
     songs = fields.Nested(SongsSchema(many=True),dump_only=True,only=('name',),data_key='setlist') 
      
     
-    
+    @post_dump(pass_many=True)
+    def wrap(self, data, many, **kwargs):
+        if many:
+            return {'tours': data}
+        return data
 
     
