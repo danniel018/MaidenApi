@@ -1,3 +1,4 @@
+from re import M
 from sqlite3 import Date
 from extensions import db
 from sqlalchemy.dialects.mysql import INTEGER, ENUM, TIME
@@ -21,11 +22,6 @@ live = db.Table ('live',
     db.Column('tour_id',db.ForeignKey('tours.tour_id')),
     db.Column('live_album_id',db.ForeignKey('live_albums.live_album_id')))
 
-live2 = db.Table ('live2',
-    db.Column('live_id',INTEGER(unsigned=True),primary_key=True),
-    #db.Column('song_id',db.ForeignKey('songs.song_id')),
-    db.Column('tour_id',db.ForeignKey('tours.tour_id')),
-    db.Column('live_album_id',db.ForeignKey('live_albums.live_album_id')))
 
 class Albums(db.Model,commit):
     __tablename__ = 'albums'
@@ -71,12 +67,23 @@ class Songs(db.Model):
     tour = db.relationship('Tours',secondary=live,back_populates='songs')
 
     @classmethod
-    def all_songs(cls,popular=False,year=None):
+    def all_songs(cls,popular=False,year=None,composer=None):
         
         if popular:
             return cls.query.filter_by(top_popular='yes').all()
         if year is not None:
             return cls.query.join(Albums, cls.album_id == Albums.album_id).filter((Albums.release_date >= f'{year}-01-01') & (Albums.release_date <= f'{year}-12-31')).all()
+        if composer is not None:
+            member = cls.query.all()
+            z=[]
+            for x in member: 
+                for r in x.members:
+                     if r.member_id == composer:
+                        z.append(x)
+            print(len(z))
+            return z
+            #compos = [x for x in member if x.members == composer]
+            #
         else:
             return cls.query.all()
 

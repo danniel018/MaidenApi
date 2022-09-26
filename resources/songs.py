@@ -6,14 +6,14 @@ from webargs import fields
 from webargs.flaskparser import use_kwargs
 from schemas.members import SongsSchema
 
-all_songs_schema = SongsSchema(many=True,exclude=('number_in_album','top_popular'))
+all_songs_schema = SongsSchema(many=True,exclude=('number_in_album','top_popular','live_album','tour'))
 song_schema = SongsSchema(exclude=('song_id','top_popular'))
 
 class MaidenSongs(Resource):
-    @use_kwargs({'year': fields.Str(missing=None)},location='query')
-    def get(self,year):
+    @use_kwargs({'year': fields.Str(missing=None),'composer':fields.Int(missing=None)},location='query')
+    def get(self,year,composer):
         
-        songs = Songs.all_songs(year=year)      
+        songs = Songs.all_songs(year=year,composer=composer)      
         return all_songs_schema.dump(songs),HTTPStatus.OK
 
 
