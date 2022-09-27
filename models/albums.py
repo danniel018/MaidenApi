@@ -3,7 +3,8 @@ from sqlite3 import Date
 from extensions import db
 from sqlalchemy.dialects.mysql import INTEGER, ENUM, TIME
 from .songs import commit
-from datetime import date
+from datetime import date, time
+
 
 
 members_songs = db.Table ('members_songs',
@@ -67,23 +68,33 @@ class Songs(db.Model):
     tour = db.relationship('Tours',secondary=live,back_populates='songs')
 
     @classmethod
-    def all_songs(cls,popular=False,year=None,composer=None):
+    def all_songs(cls,popular=False,year=None,composer=None,length_gt=None):
         
         if popular:
             return cls.query.filter_by(top_popular='yes').all()
+
         if year is not None:
-            return cls.query.join(Albums, cls.album_id == Albums.album_id).filter((Albums.release_date >= f'{year}-01-01') & (Albums.release_date <= f'{year}-12-31')).all()
+            songs= cls.query.join(Albums, cls.album_id == Albums.album_id).filter((Albums.release_date >= f'{year}-01-01') & (Albums.release_date <= f'{year}-12-31')).all()
+            if composer is not None:
+                z=[]
+                for x in songs: 
+                    for r in x.members:
+                        if r.member_id == composer:
+                            z.append(x)
+                return z 
+            return songs
+
         if composer is not None:
             member = cls.query.all()
             z=[]
             for x in member: 
                 for r in x.members:
-                     if r.member_id == composer:
+                    if r.member_id == composer:
                         z.append(x)
-            print(len(z))
-            return z
-            #compos = [x for x in member if x.members == composer]
-            #
+            return z  
+        if length_gt is not None:
+            print(time(length_gt))
+            return cls.query.filter((cls.length) > (time(0,length_gt))).all()  
         else:
             return cls.query.all()
 

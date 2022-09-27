@@ -10,10 +10,10 @@ all_songs_schema = SongsSchema(many=True,exclude=('number_in_album','top_popular
 song_schema = SongsSchema(exclude=('song_id','top_popular'))
 
 class MaidenSongs(Resource):
-    @use_kwargs({'year': fields.Str(missing=None),'composer':fields.Int(missing=None)},location='query')
-    def get(self,year,composer):
+    @use_kwargs({'year': fields.Str(missing=None),'composer':fields.Int(missing=None),'gt':fields.Int(missing=None)},location='query')
+    def get(self,year,composer,gt):
         
-        songs = Songs.all_songs(year=year,composer=composer)      
+        songs = Songs.all_songs(year=year,composer=composer,length_gt=gt)      
         return all_songs_schema.dump(songs),HTTPStatus.OK
 
 
