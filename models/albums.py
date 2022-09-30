@@ -1,6 +1,7 @@
 from re import M
 from sqlite3 import Date
 from extensions import db
+from sqlalchemy import func, desc
 from sqlalchemy.dialects.mysql import INTEGER, ENUM, TIME
 from .songs import commit
 from datetime import date, time
@@ -110,6 +111,18 @@ class Songs(db.Model):
         songs = cls.query.filter_by(song_id = id).first()
         return songs
 
+    @classmethod
+    def general_info(cls,query):
+
+        if query == 1:
+            return cls.query.order_by(desc(cls.length)).first()
+        elif query == 2:
+            return cls.query.order_by(cls.length).first()
+        else:
+            return db.session.query(func.count(cls.song_id)).first()
+         
+
+        #return song
     
 class Users(db.Model,commit):
     __tablename__ = 'users'

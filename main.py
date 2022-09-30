@@ -8,6 +8,7 @@ from resources.songs import MaidenSongs, PopularSongs, Song
 from resources.users import NewUser
 from resources.token import Token, RefreshToken,RevokeToken,block_list
 from resources.tours import MaidenTours, Tour
+from resources.band import Band
 
 app = Flask(__name__)
 app.config.from_object(Config)
@@ -38,6 +39,8 @@ api.add_resource(MaidenTours,'/tours')
 api.add_resource(Tour,'/tours/<int:id>')
 
 api.add_resource(NewUser,'/users')
+
+api.add_resource(Band,'/band')
 
 
 api.add_resource(Token,'/token')
