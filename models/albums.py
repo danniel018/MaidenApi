@@ -5,6 +5,9 @@ from sqlalchemy import func, desc
 from sqlalchemy.dialects.mysql import INTEGER, ENUM, TIME
 from .songs import commit
 from datetime import date, time
+import math
+
+
 
 
 
@@ -118,7 +121,18 @@ class Songs(db.Model):
             return cls.query.order_by(desc(cls.length)).first()
         elif query == 2:
             return cls.query.order_by(cls.length).first()
-        else:
+        elif query == 3:
+            length = db.session.query(func.time_to_sec(cls.length)).all()
+            
+            l = 0
+            avg_list = [x[0] for x in length] 
+            avg = int(sum(avg_list)/ len(length))
+            min= int(avg/60)
+            sec=avg % 60
+            avg=time(0,min,sec)
+            print(avg)
+            return avg
+        else: 
             return db.session.query(func.count(cls.song_id)).first()
          
 
