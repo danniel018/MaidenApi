@@ -32,9 +32,16 @@ class Band(Resource):
         song = Songs.general_info(query=4)
         total_songs={'total recorded song':song[0]}
 
+        album = Albums.general_info(query=4)
+        most={'most songs in an album':{'album':album[0],'songs':album[1]}}
 
+        album = Albums.general_info(query=3)
+        avg_album = {'average album length':utils.to_iso_time(album)}
 
-        return [l_song,s_song,total_songs,avg_song],HTTPStatus.OK
+        albums = Albums.general_info(query=5)
+        by_decade = {'albums by decade':albums}
+       
+        return [l_song,s_song,total_songs,avg_song,most,avg_album,by_decade],HTTPStatus.OK
 
 
 

@@ -56,6 +56,54 @@ class Albums(db.Model,commit):
         album = cls.query.filter_by(album_id = id).first()
         return album
 
+    @classmethod
+    def general_info(cls,query):
+
+        if query == 1:
+            return cls.query.order_by(desc(cls.length)).first()
+        elif query == 2:
+            return cls.query.order_by(cls.length).first()
+        elif query == 3:
+            length = db.session.query(func.time_to_sec(cls.length)).all()
+            avg = Albums.average(length)
+            return avg
+        elif query == 4: 
+            album = db.session.query(cls.name,(func.count(Songs.album_id).label('n_songs')))\
+                .join(Songs,cls.album_id == Songs.album_id).group_by((Songs.album_id))\
+                .order_by(desc('n_songs')).first()
+            return album
+
+        else: 
+            
+            decades = db.session.query(func.count(cls.album_id),\
+                func.sum(func.IF(cls.release_date < '1990-01-01',1,0)),
+                func.sum(func.IF((cls.release_date > '1990-01-01') & 
+                (cls.release_date < '2000-01-01'),1,0)),
+                func.sum(func.IF((cls.release_date > '2000-01-01') & 
+                (cls.release_date < '2010-01-01'),1,0)),
+                func.sum(func.IF((cls.release_date > '2010-01-01') & 
+                (cls.release_date < '2020-01-01'),1,0)),
+                func.sum(func.IF((cls.release_date > '2020-01-01'),1,0)))\
+                .first()
+
+            by_decade = {'80s':int(decades[1]),'90s':int(decades[2]),
+                '00s':int(decades[3]),'10s':int(decades[4]),'20s':int(decades[5])}
+            return by_decade
+         
+    @staticmethod
+    def average(length):
+        avg_list = [x[0] for x in length] 
+        avg = int(sum(avg_list)/ len(length))
+        h=0
+        sec=avg % 60
+        min= int(avg/60)
+        if avg > 3600:
+            h = int(min/60)
+            min = min % 60
+
+        avg=time(h,min,sec)
+        return avg
+
    
 class Songs(db.Model):
     __tablename__ = 'songs'
@@ -123,20 +171,13 @@ class Songs(db.Model):
             return cls.query.order_by(cls.length).first()
         elif query == 3:
             length = db.session.query(func.time_to_sec(cls.length)).all()
-            
-            l = 0
-            avg_list = [x[0] for x in length] 
-            avg = int(sum(avg_list)/ len(length))
-            min= int(avg/60)
-            sec=avg % 60
-            avg=time(0,min,sec)
-            print(avg)
+            avg = Albums.average(length)
             return avg
+            
         else: 
             return db.session.query(func.count(cls.song_id)).first()
-         
-
-        #return song
+        
+        
     
 class Users(db.Model,commit):
     __tablename__ = 'users'
