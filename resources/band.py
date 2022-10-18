@@ -10,7 +10,7 @@ from marshmallow import fields ,utils
 
 
 all_albums_schema = AlbumsSchema(many=True,exclude=('cover','length','album_songs','members'))
-album_schema = AlbumsSchema()
+album_schema = AlbumsSchema(only=('name','release_date','length'))
 songs_schema = SongsSchema(only=('name','album','length'))    
 
 all_live_albums_schema = LiveAlbumsSchema(many=True,exclude=('length','songs'))
@@ -32,6 +32,9 @@ class Band(Resource):
         song = Songs.general_info(query=4)
         total_songs={'total recorded song':song[0]}
 
+        song = Songs.general_info(query=5)
+        most_live={'most recorded live song':{'song':song[0],'times recorded':song[1]}}
+
         album = Albums.general_info(query=4)
         most={'most songs in an album':{'album':album[0],'songs':album[1]}}
 
@@ -40,8 +43,14 @@ class Band(Resource):
 
         albums = Albums.general_info(query=5)
         by_decade = {'albums by decade':albums}
+
+        album = Albums.general_info(query=1)  
+        l_album = {'longest album':album_schema.dump(album)}
+        album = Albums.general_info(query=2)
+        s_album = {'shortest album':album_schema.dump(album)}
        
-        return [l_song,s_song,total_songs,avg_song,most,avg_album,by_decade],HTTPStatus.OK
+        return [l_song,s_song,total_songs,most_live,avg_song,most,
+            avg_album,by_decade,l_album,s_album],HTTPStatus.OK
 
 
 

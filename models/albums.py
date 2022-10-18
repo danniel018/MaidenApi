@@ -172,10 +172,16 @@ class Songs(db.Model):
         elif query == 3:
             length = db.session.query(func.time_to_sec(cls.length)).all()
             avg = Albums.average(length)
-            return avg
-            
-        else: 
+            return avg 
+        elif query == 4: 
             return db.session.query(func.count(cls.song_id)).first()
+        else:
+            song = db.session.execute("SELECT s.name, COUNT(l.song_id) as times "
+            "FROM live as l JOIN songs as s ON s.song_id = l.song_id WHERE " 
+            "l.live_album_id IS NOT NULL GROUP BY l.song_id ORDER BY times "
+            "DESC LIMIT 1").first()
+            print(song)
+            return song
         
         
     
