@@ -4,4 +4,5 @@
 /models/__pycache__/
 /resources/__pycache__/
 /schemas/__pycache__/
-*config.py 
+*config.py
+*.yaml 

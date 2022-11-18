@@ -1,6 +1,7 @@
 from flask import Flask
 from flask_restful import  Api
-from config import Config
+import os
+from config import Config, Production, Development
 from extensions import db, jwt
 from resources.members import MaidenMembers, Member
 from resources.albums import MaidenAlbums, Album, LiveMaidenAlbums, LiveAlbum
@@ -10,10 +11,17 @@ from resources.token import Token, RefreshToken,RevokeToken,block_list
 from resources.tours import MaidenTours, Tour
 from resources.band import Band
 
+env = os.environ.get('ENV', 'Development')
+if env == 'Production':
+    config = Production()
+else:
+    config = Development()
+    
+
 app = Flask(__name__)
-app.config.from_object(Config)
+app.config.from_object(config)
 db.init_app(app)
-jwt.init_app(app)
+jwt.init_app(app) 
 api = Api(app) 
 
 
@@ -48,5 +56,5 @@ api.add_resource(RefreshToken,'/refresh')
 api.add_resource(RevokeToken,'/revoke') 
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run()
 

@@ -120,30 +120,26 @@ class Songs(db.Model):
     tour = db.relationship('Tours',secondary=live,back_populates='songs')
 
     @classmethod
-    def all_songs(cls,popular=False,year=None,composer=None,length_gt=None):
+    def all_songs(cls,popular=False,year=None,length_gt=None):
         
         if popular:
             return cls.query.filter_by(top_popular='yes').all()
 
+
         if year is not None:
-            songs= cls.query.join(Albums, cls.album_id == Albums.album_id).filter((Albums.release_date >= f'{year}-01-01') & (Albums.release_date <= f'{year}-12-31')).all()
-            if composer is not None:
-                z=[]
+            songs= cls.query.join(Albums, cls.album_id == Albums.album_id)\
+                .filter((Albums.release_date >= f'{year}-01-01') & \
+                    (Albums.release_date <= f'{year}-12-31')).all()
+
+            if length_gt is not None:
+                filtered_songs=[]
                 for x in songs: 
-                    for r in x.members:
-                        if r.member_id == composer:
-                            z.append(x)
-                return z 
+                    if x.length > time(0,length_gt):
+                        filtered_songs.append(x)
+                return filtered_songs 
             return songs
 
-        if composer is not None:
-            member = cls.query.all()
-            z=[]
-            for x in member: 
-                for r in x.members:
-                    if r.member_id == composer:
-                        z.append(x)
-            return z  
+      
         if length_gt is not None:
             print(time(length_gt))
             return cls.query.filter((cls.length) > (time(0,length_gt))).all()  
